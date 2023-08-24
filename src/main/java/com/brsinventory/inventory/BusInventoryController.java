@@ -13,7 +13,7 @@ import java.util.Optional;
 @RequestMapping("/api/v1")
 public class BusInventoryController {
 
-    BusInventoryService busInventoryService;
+    private final BusInventoryService busInventoryService;
 
     @Autowired
     BusInventoryController(BusInventoryService busInventoryService) {
