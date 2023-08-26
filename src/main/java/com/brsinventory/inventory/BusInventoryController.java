@@ -42,7 +42,7 @@ public class BusInventoryController {
     ResponseEntity<BusInventory> getBusInventory(@PathVariable("bus_id") Integer busId) {
         Optional<BusInventory> busDetail = busInventoryService.getBusInventory(busId);
         if(busDetail.isPresent()){
-            return ResponseEntity.status(HttpStatus.CREATED).body(busDetail.get());
+            return ResponseEntity.status(HttpStatus.OK).body(busDetail.get());
         }
        else {
             throw new BRSResourceNotFoundException(String.format("Bus inventory details with id %d not found",busId));
