@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class Booking {
     private BusRoute bus;
 
     @Column(name = "booking_date")
-    private Instant bookingDate;
+    private LocalDateTime bookingDate;
 
     @Column(name = "no_of_seats")
     private Integer noOfSeats;

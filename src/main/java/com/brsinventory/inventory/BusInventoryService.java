@@ -2,14 +2,16 @@ package com.brsinventory.inventory;
 
 import com.brsinventory.exception.BRSResourceNotFoundException;
 import com.brsinventory.messages.BusBookingMessage;
+import com.brsinventory.messages.MessageBroker;
 import com.brsinventory.messages.MessageDestinationConst;
-import com.brsinventory.util.MessageBroker;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BusInventoryService {
@@ -20,13 +22,15 @@ public class BusInventoryService {
     private final BusRouteRepository busRouteRepository;
 
     private final BookingRepository bookingRepository;
+    private final ObjectMapper objectMapper;
     @Autowired
     BusInventoryService(BusInventoryRepository busInventoryRepository,
-                        MessageBroker messageBroker, BusRouteRepository busRouteRepository, BookingRepository bookingRepository) {
+                        MessageBroker messageBroker, BusRouteRepository busRouteRepository, BookingRepository bookingRepository, ObjectMapper objectMapper) {
         this.busInventoryRepository = busInventoryRepository;
         this.messageBroker = messageBroker;
         this.busRouteRepository = busRouteRepository;
         this.bookingRepository = bookingRepository;
+        this.objectMapper = objectMapper;
     }
 
     public BusInventory saveBusInventory(BusInventory busInventory) {
@@ -59,7 +63,10 @@ public class BusInventoryService {
     }
 
     @JmsListener(destination = MessageDestinationConst.DEST_UPDATE_INVENTORY)
-    public void receiveMessage(BusBookingMessage busBookingMessage) {
+    public void receiveMessage(Map<String, Object> object) {
+        final BusBookingMessage busBookingMessage = objectMapper.convertValue(object, BusBookingMessage.class);
+        System.out.println("Received message: " + busBookingMessage);
+
         BusInventory busInventory = busInventoryRepository
                 .findByBusId(busBookingMessage.getBusId()).orElse(null);
 
