@@ -17,9 +17,11 @@ public class Booking {
     @Column(name = "booking_id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "bus_id", nullable = false)
-    private BusRoute bus;
+    @Column(name = "bus_id", nullable = false)
+    private Integer busId;
+
+    @Column(name = "customer_id", nullable = false)
+    private Integer customerId;
 
     @Column(name = "booking_date")
     private LocalDateTime bookingDate;

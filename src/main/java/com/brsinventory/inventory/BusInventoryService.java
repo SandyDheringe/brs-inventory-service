@@ -5,6 +5,8 @@ import com.brsinventory.messages.BusBookingMessage;
 import com.brsinventory.messages.MessageBroker;
 import com.brsinventory.messages.MessageDestinationConst;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class BusInventoryService {
 
     private final BookingRepository bookingRepository;
     private final ObjectMapper objectMapper;
+    Logger logger = LoggerFactory.getLogger(BusInventoryService.class);
     @Autowired
     BusInventoryService(BusInventoryRepository busInventoryRepository,
                         MessageBroker messageBroker, BusRouteRepository busRouteRepository, BookingRepository bookingRepository, ObjectMapper objectMapper) {
@@ -34,14 +37,17 @@ public class BusInventoryService {
     }
 
     public BusInventory saveBusInventory(BusInventory busInventory) {
+        logger.debug("saveBusInventory: {}",busInventory);
         return busInventoryRepository.saveAndFlush(busInventory);
     }
 
     public List<BusInventory> getAllBusesInventory() {
+        logger.debug("getAllBusesInventory");
         return busInventoryRepository.findAll();
     }
 
     public BusInventory getBusInventory(Integer busId) {
+        logger.debug("getBusInventory {}",busId);
         BusInventory busInventory = busInventoryRepository.findByBusId(busId).orElse(null);
         if (busInventory == null) {
             initBusInventory(busId);
@@ -50,6 +56,7 @@ public class BusInventoryService {
     }
 
     private void initBusInventory(Integer busId) {
+        logger.debug("initBusInventory {}",busId);
         BusRoute busRouteDetail = busRouteRepository.findById(busId).orElse(null);
         if (busRouteDetail != null) {
             BusInventory busInventoryNew = new BusInventory();
@@ -58,14 +65,16 @@ public class BusInventoryService {
             busInventoryNew.setLastUpdatedDate(LocalDateTime.now());
             busInventoryRepository.saveAndFlush(busInventoryNew);
         } else {
+            logger.debug("initBusInventory: Bus detail of id {} not found",busId);
             throw new BRSResourceNotFoundException(String.format("Bus detail of id %d not found", busId));
         }
     }
 
     @JmsListener(destination = MessageDestinationConst.DEST_UPDATE_INVENTORY)
-    public void receiveMessage(Map<String, Object> object) {
+    public void updateBusInventory(Map<String, Object> object) {
+
         final BusBookingMessage busBookingMessage = objectMapper.convertValue(object, BusBookingMessage.class);
-        System.out.println("Received message: " + busBookingMessage);
+        logger.debug("updateBusInventory {}",busBookingMessage);
 
         BusInventory busInventory = busInventoryRepository
                 .findByBusId(busBookingMessage.getBusId()).orElse(null);

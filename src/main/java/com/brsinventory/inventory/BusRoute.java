@@ -18,7 +18,7 @@ public class BusRoute {
     @Column(name = "bus_number", length = 20)
     private String busNumber;
 
-    @Column(name = "bus_type", length = 20)
+    @Column(name = "bus_type", length = 50)
     private String busType;
 
     @Column(name = "total_seats")
