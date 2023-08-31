@@ -13,7 +13,7 @@ public class BrsInventoryServiceApplication {
 //        SpringApplication.run(BrsInventoryServiceApplication.class, args);
 
         new SpringApplicationBuilder()
-                .profiles("dev")
+                .profiles("prod")
                 .sources(BrsInventoryServiceApplication.class)
                 .run(args);
     }
